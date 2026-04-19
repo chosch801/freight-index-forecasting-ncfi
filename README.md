@@ -53,11 +53,14 @@ The project integrates multiple real-world datasets:
 
 ### Train-Test Split
 
-The dataset is divided using a chronological split rather than random sampling.
+The dataset is split chronologically using an 80/20 ratio to preserve the temporal structure of the time series.
 
-A portion of the earlier time-series data is used for training, while the remaining later portion is used for testing. This is implemented through index-based slicing to ensure temporal consistency.
+- Training set: June 2015 – January 2023  
+- Test set: February 2023 – December 2024  
 
-Such a split simulates real-world forecasting, where models are trained on past data and evaluated on future observations.
+The split is implemented using index-based slicing, ensuring that the model is trained only on past data and evaluated on future observations.
+
+This approach avoids data leakage and reflects real-world forecasting scenarios.
 
 ---
 
