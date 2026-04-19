@@ -1,116 +1,142 @@
-# NCFI Freight Rate Index Prediction
+# Freight Index Forecasting (NCFI)
 
-> 宁波美西航线集装箱运价指数（NCFI）预测 —— 基于多源供应链数据的机器学习与时间序列建模
+### MIT Global SCALE Network Project (Outstanding)
 
----
-
-## 项目简介
-
-本项目旨在对**宁波集装箱运价指数（Ningbo Containerized Freight Index, NCFI）美西航线**进行预测分析。通过整合洛杉矶港口运营数据、宏观经济指标、燃油价格及中国制造业景气指数等多维供应链数据，构建并对比多种预测模型，探索影响跨太平洋集运市场运价波动的关键因素。
+📅 Jan 2025 – Mar 2025
 
 ---
 
-## 数据来源
+## 📌 Overview
 
-| 文件 | 内容 | 时间范围 |
-|------|------|----------|
-| `Table1_只保留中国制造业PMI_月度数据(2014-2024).xlsx` | 中国制造业 PMI 月度数据 | 2014–2024 |
-| `Table2_LA LB_CPI.xlsx` | 洛杉矶-长滩地区消费者价格指数 (CPI) | — |
-| `Table3_Diesel_Price(2004-2024).xlsx` | 美国柴油价格（美分/加仑） | 2004–2024 |
-| `Table4_LA_Container_TEUs.xlsx` | 洛杉矶港口集装箱吞吐量（TEUs） | 2012–2024 |
-| `Table5_美西运价指数NCFI(2014-2024).xlsx` | 宁波集装箱运价指数（目标变量） | 2014–2024 |
-| `Table6_LA_Vessel_Activity.xlsx` | 洛杉矶港船舶活动数据（锚泊、靠泊、离港等） | 2015–2024 |
+This project focuses on forecasting the Ningbo Containerized Freight Index (NCFI) using real-world logistics and macroeconomic data.
+
+The project integrates multiple data sources and applies both statistical and machine learning models to analyze freight rate dynamics.
+
+Developed under the MIT Global SCALE Network Digital Supply Chain Microprogram, it was awarded **Outstanding performance**.
 
 ---
 
-## 特征工程
+## 💼 Business Context
 
-- **滞后特征**：NCFI 过去 1、2、3 个月的值（`NCFI_lag1/2/3`）
-- **移动平均**：3 个月与 12 个月滚动均值（`NCFI_MA3`, `NCFI_MA12`）
-- **STL 季节性分解**：趋势项、季节项、残差项（`trend_stl`, `seasonal_stl`, `residual_stl`）
-- **节假日标记**：美国联邦节假日月度标记（`Federal_Holiday`）
-- **时间特征**：月份、季度
+Freight rates are highly volatile and directly affect:
 
----
+* Shipping pricing strategies
+* Logistics planning and cost control
+* Supply chain risk management
 
-## 模型方法
-
-### 1. 线性回归（基准模型）
-- `sklearn.LinearRegression`
-- PyTorch 实现的线性回归（用于对照验证）
-
-### 2. 随机森林
-- `sklearn.RandomForestRegressor`
-- 采用时间序列交叉验证（`TimeSeriesSplit`, 10 折）
-- 基于特征重要性得分进行特征分析
-
-### 3. SARIMAX
-- 使用 `pmdarima.auto_arima` 自动调优 $(p,d,q)(P,D,Q)_m$ 参数
-- 引入外生变量：柴油价格、锚泊船舶数
-- 动态滚动单步预测（Rolling Forecast）
-
-### 4. LSTM（长短期记忆网络）
-- PyTorch 实现，序列窗口长度为 3
-- 特征标准化（`StandardScaler`）
-- 学习率自适应调度（`ReduceLROnPlateau`）
-- 梯度法特征重要性可视化
+Accurate forecasting helps anticipate market fluctuations and supports data-driven decision-making.
 
 ---
 
-## 评估指标
+## 📊 Data Sources
 
-| 指标 | 说明 |
-|------|------|
-| RMSE | 均方根误差 |
-| R² | 决定系数 |
-| MAE | 平均绝对误差 |
-| MAPE | 平均绝对百分比误差 |
-| DA | 方向准确性（涨跌方向预测正确率） |
+The project integrates multiple real-world datasets:
+
+* NCFI freight index (target variable)
+* Manufacturing PMI
+* CPI (consumer price index)
+* Diesel prices
+* Port container throughput (TEUs)
+* Vessel activity data
 
 ---
 
-## 项目结构
+## ⚙️ Methodology
 
+### Data Processing
+
+* Time-series alignment across multiple datasets
+* Handling missing values and scaling
+* Construction of supervised learning format
+
+---
+
+### Train-Test Split
+
+The dataset is divided using a chronological split rather than random sampling.
+
+A portion of the earlier time-series data is used for training, while the remaining later portion is used for testing. This is implemented through index-based slicing to ensure temporal consistency.
+
+Such a split simulates real-world forecasting, where models are trained on past data and evaluated on future observations.
+
+---
+
+### Feature Engineering
+
+* Lag features for temporal dependency
+* Moving averages (MA)
+* Seasonal-Trend decomposition (STL)
+
+---
+
+### Models
+
+#### 1. Linear Regression (Baseline)
+
+* Used as a simple benchmark
+* Provides reference for model improvement
+
+---
+
+#### 2. SARIMAX (Core Model)
+
+* Incorporates external variables
+* Performs well in capturing temporal structure
+* Achieved the most stable performance among all models
+
+---
+
+#### 3. Random Forest
+
+* Captures nonlinear relationships
+* Performance observed to be unstable across different periods
+
+---
+
+#### 4. LSTM
+
+* Deep learning model for sequence modeling
+* Sensitive to normalization and architecture design
+* Shows potential but requires careful tuning
+
+---
+
+## 📊 Results & Observations
+
+* SARIMAX provides the most reliable and stable predictions
+* Random Forest struggles with temporal generalization
+* LSTM performance improves after tuning but is not consistently superior
+* The model tends to learn patterns from previous years (e.g., 2021 → 2022), indicating challenges in regime shifts
+
+---
+
+## 🧠 My Contributions
+
+* Designed and implemented an end-to-end forecasting pipeline
+* Integrated multi-source real-world logistics and economic data
+* Engineered time-series features including lag variables, MA, and STL decomposition
+* Built and compared multiple models (statistical + ML + deep learning)
+* Conducted critical analysis of model performance under real-world conditions
+
+---
+
+## 📂 Project Structure
+
+```id="p4j6r8"
+├── NCFI_Prediction.ipynb   # main analysis & modeling
+├── Table*.xlsx            # raw datasets
+└── README.md
 ```
-NCFI-prediction-main/
-├── NCFI_Prediction.ipynb      # 主分析 Notebook
-├── README.md
-├── Table1_只保留中国制造业PMI_月度数据(2014-2024).xlsx
-├── Table2_LA LB_CPI.xlsx
-├── Table3_Diesel_Price(2004-2024).xlsx
-├── Table4_LA_Container_TEUs.xlsx
-├── Table5_美西运价指数NCFI(2014-2024).xlsx
-├── Table6_LA_Vessel_Activity.xlsx
-└── merged_data_cleaned_final.csv   # 清洗合并后的数据（运行后生成）
-```
 
 ---
 
-## 环境依赖
+## 🏅 Certification
 
-```bash
-pip install pandas numpy scikit-learn statsmodels pmdarima torch matplotlib seaborn openpyxl
-```
-
----
-
-## 快速开始
-
-1. 将所有 Excel 数据文件放置于 `NCFI_Prediction.ipynb` 同目录下
-2. 按顺序运行 Notebook 各单元格
-3. 数据预处理完成后会生成 `merged_data_cleaned_final.csv`
+This project was completed as part of the MIT Global SCALE Network
+Digital Supply Chain Microprogram and awarded **Outstanding performance**.
 
 ---
 
-## 主要结论
+## 📎 Notes
 
-- **SARIMAX** 在引入外生变量与自动参数调优后，预测效果最为稳定，适合短期动态滚动预测。
-- **随机森林** 在 2021–2022 年运价剧烈波动期预测误差较大，反映树模型对极端趋势外推能力有限。
-- **LSTM** 经过参数调优后表现良好，梯度重要性分析与随机森林特征重要性结果基本一致。
-- 滞后特征（`NCFI_lag1`）与移动平均特征对预测贡献最大；宏观指标（PMI、柴油价格）提供辅助解释力。
-
----
-
-## 许可证
-
-本项目仅供学术研究与课程作业使用。
+This project reflects real-world challenges in freight forecasting, including data heterogeneity, model instability, and market regime shifts.
